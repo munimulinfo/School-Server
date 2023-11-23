@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
 import { User, UserAddress, UserName, UserOrders } from "./user.interface";
 
 //create user full name schema
@@ -42,6 +43,7 @@ const UsersSchema = new Schema<User>({
   orders: [{ type: UserOrdersSchema }],
 });
 
+//rsponse data delet
 UsersSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
@@ -49,6 +51,15 @@ UsersSchema.methods.toJSON = function () {
   delete obj.__v;
   return obj;
 };
+
+//Hashing password
+UsersSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(this.password, salt);
+  this.password = hash;
+  next();
+});
 
 // create userModel schema
 export const UserModel = model<User>("user", UsersSchema);
