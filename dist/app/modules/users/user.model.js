@@ -55,17 +55,20 @@ const UsersSchema = new mongoose_1.Schema({
 });
 //rsponse data delet
 UsersSchema.methods.toJSON = function () {
-    const obj = this.toObject();
-    delete obj.password;
-    delete obj._id;
-    delete obj.__v;
-    return obj;
+    try {
+        const obj = this.toObject();
+        delete obj.password;
+        delete obj._id;
+        delete obj.__v;
+        return obj;
+    }
+    catch (error) {
+        throw new Error(`${error}`);
+    }
 };
 //Hashing password
 UsersSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!this.isModified("password"))
-            return next();
         const salt = yield bcrypt_1.default.genSalt(10);
         const hash = yield bcrypt_1.default.hash(this.password, salt);
         this.password = hash;

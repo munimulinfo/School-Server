@@ -68,11 +68,23 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const id = Number(req.params.userId);
         const result = yield user_service_1.userServices.getSingleUserFromDb(id);
-        res.status(200).json({
-            success: true,
-            message: "Single User fetch Successfully",
-            data: result,
-        });
+        if (result) {
+            res.status(200).json({
+                success: true,
+                message: "Single User fetch Successfully",
+                data: result,
+            });
+        }
+        else {
+            res.status(500).json({
+                success: false,
+                message: "User not found",
+                error: {
+                    code: 404,
+                    description: "User not found!",
+                },
+            });
+        }
     }
     catch (error) {
         res.status(500).json({
@@ -90,20 +102,29 @@ const deletSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function
     try {
         const id = Number(req.params.userId);
         const result = yield user_service_1.userServices.deletSingleUserFromDb(id);
-        res.status(200).json({
-            success: true,
-            message: "User Deleted Succesfully",
-            data: result,
-        });
+        if (result.deletedCount > 0) {
+            res.status(200).json({
+                success: true,
+                message: "User Deleted Succesfully",
+                data: null,
+            });
+        }
+        else {
+            res.status(500).json({
+                success: false,
+                message: "User not found",
+                error: {
+                    code: 404,
+                    description: "User not found!",
+                },
+            });
+        }
     }
     catch (error) {
         res.status(500).json({
             success: false,
             message: "User not found",
-            error: {
-                code: 404,
-                description: "User not found!",
-            },
+            error: error,
         });
     }
 });
@@ -135,11 +156,11 @@ const createUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, functio
     try {
         const orderId = Number(req.params.userId);
         const newOrder = req.body;
-        const result = yield user_service_1.userServices.userOrdersCreateInToDb(newOrder, orderId);
+        yield user_service_1.userServices.userOrdersCreateInToDb(newOrder, orderId);
         res.status(200).json({
             success: true,
             message: "Order created successfully!",
-            data: result,
+            data: null,
         });
     }
     catch (error) {
@@ -170,7 +191,7 @@ const getOrdersSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, func
             message: "User not found",
             error: {
                 code: 404,
-                description: "User not found!",
+                description: error.message,
             },
         });
     }
@@ -190,8 +211,11 @@ const getTotalPriceSingleUserOrder = (req, res) => __awaiter(void 0, void 0, voi
     catch (error) {
         res.status(500).json({
             success: false,
-            message: "Total price calculated not successfully!",
-            error: error,
+            message: "User not found",
+            error: {
+                code: 404,
+                description: error.message,
+            },
         });
     }
 });

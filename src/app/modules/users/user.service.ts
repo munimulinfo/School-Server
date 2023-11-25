@@ -1,16 +1,15 @@
 import { User, UserOrders } from "./user.interface";
 import { UserModel } from "./user.model";
-
+//create user in to database
 const createUserInToDb = async (user: User) => {
   const result = await UserModel.create(user);
   return result;
 };
-
+// get all user From database
 const getAllUserFromDb = async () => {
   const result = await UserModel.find(
     {},
     {
-      userId: 1,
       username: 1,
       email: 1,
       address: 1,
@@ -22,6 +21,8 @@ const getAllUserFromDb = async () => {
   );
   return result;
 };
+
+// get single user from database
 
 const getSingleUserFromDb = async (userId: number) => {
   const result = await UserModel.findOne(
@@ -40,10 +41,13 @@ const getSingleUserFromDb = async (userId: number) => {
   return result;
 };
 
+// single user delet on to db
 const deletSingleUserFromDb = async (userId: number) => {
   const result = await UserModel.deleteOne({ userId });
   return result;
 };
+
+// single user update in to db
 
 const updateUserInToDb = async (updatedData: User, id: number) => {
   const {
@@ -58,7 +62,7 @@ const updateUserInToDb = async (updatedData: User, id: number) => {
     address: { street, city, country },
   } = updatedData;
 
-  const result = await UserModel.updateOne(
+  await UserModel.updateOne(
     { userId: id },
     {
       $set: {
@@ -75,9 +79,12 @@ const updateUserInToDb = async (updatedData: User, id: number) => {
     }
   );
 
-  return result;
+  const updateUser = await UserModel.findOne({ userId: id });
+
+  return updateUser;
 };
 
+// updates user orders in to db
 const userOrdersCreateInToDb = async (newOrder: UserOrders, id: number) => {
   const result = await UserModel.updateOne(
     { userId: id },
@@ -92,16 +99,20 @@ const userOrdersCreateInToDb = async (newOrder: UserOrders, id: number) => {
   return result;
 };
 
+// get all order int to single user
 const getOrdersOfSingleUserFromDb = async (userId: number) => {
-  const result = await UserModel.findOne({ userId }, { orders: 1 });
+  const result = await UserModel.findOne({ userId: userId }, { orders: 1 });
+  if (!result) {
+    throw new Error("user not found");
+  }
   return result;
 };
 
+// get total price int to db
 const getAllOrderPriceSingleUserFromDb = async (userId: number) => {
   const result = await UserModel.findOne({ userId });
-
   if (!result || !result.orders) {
-    return null;
+    throw new Error("user not found");
   }
   // Calculate total price
   const totalPrice = result.orders.reduce((total, order) => {

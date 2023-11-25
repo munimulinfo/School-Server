@@ -45,16 +45,19 @@ const UsersSchema = new Schema<User>({
 
 //rsponse data delet
 UsersSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  delete obj._id;
-  delete obj.__v;
-  return obj;
+  try {
+    const obj = this.toObject();
+    delete obj.password;
+    delete obj._id;
+    delete obj.__v;
+    return obj;
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
 };
 
 //Hashing password
 UsersSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(this.password, salt);
   this.password = hash;
