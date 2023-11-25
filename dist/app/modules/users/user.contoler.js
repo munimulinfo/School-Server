@@ -19,23 +19,23 @@ const user_validation_1 = __importDefault(require("./user.validation"));
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.body;
-        const { error } = user_validation_1.default.validate(user);
-        const result = yield user_service_1.userServices.createUserInToDb(user);
+        const { error, value } = user_validation_1.default.validate(user);
         if (error) {
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
                 message: "User created not successfull",
                 error: error.details,
             });
         }
-        res.status(200).json({
+        const result = yield user_service_1.userServices.createUserInToDb(value);
+        return res.status(200).json({
             success: true,
             message: "User created successfully!",
             data: result,
         });
     }
     catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "User created not successfull",
             error: error,
@@ -184,6 +184,7 @@ const getOrdersSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, func
             message: "Order fetched successfully!",
             data: result,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (error) {
         res.status(500).json({
@@ -207,6 +208,7 @@ const getTotalPriceSingleUserOrder = (req, res) => __awaiter(void 0, void 0, voi
                 totalPrice: result,
             },
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (error) {
         res.status(500).json({

@@ -23,10 +23,24 @@ const UserOrdersSchema = new Schema<UserOrders>({
 
 // create user main schema
 const UsersSchema = new Schema<User>({
-  userId: { type: Number, required: true, unique: true },
-  username: { type: String, required: true, unique: true, trim: true },
+  userId: {
+    type: Number,
+    required: [true, "UserId is must be unique"],
+    unique: true,
+  },
+  username: {
+    type: String,
+    required: [true, "User Name is must be unique"],
+    unique: true,
+    trim: true,
+  },
   password: { type: String, trim: true },
-  email: { type: String, required: true, unique: true, trim: true },
+  email: {
+    type: String,
+    required: [true, "Email must be unique"],
+    unique: true,
+    trim: true,
+  },
   fullName: {
     type: UserNameSchema,
     required: true,

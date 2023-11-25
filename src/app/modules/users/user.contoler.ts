@@ -7,24 +7,23 @@ import userValidationSchema from "./user.validation";
 const createUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
-    const { error } = userValidationSchema.validate(user);
-    const result = await userServices.createUserInToDb(user);
-
+    const { error, value } = userValidationSchema.validate(user);
     if (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "User created not successfull",
         error: error.details,
       });
     }
 
-    res.status(200).json({
+    const result = await userServices.createUserInToDb(value);
+    return res.status(200).json({
       success: true,
       message: "User created successfully!",
       data: result,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "User created not successfull",
       error: error,
@@ -169,6 +168,7 @@ const getOrdersSingleUser = async (req: Request, res: Response) => {
       message: "Order fetched successfully!",
       data: result,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
       success: false,
@@ -192,6 +192,7 @@ const getTotalPriceSingleUserOrder = async (req: Request, res: Response) => {
         totalPrice: result,
       },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     res.status(500).json({
       success: false,
